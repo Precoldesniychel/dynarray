@@ -1,0 +1,7 @@
+C:/variant17/build/CMakeFiles/core.dir
+C:/variant17/build/CMakeFiles/v17.dir
+C:/variant17/build/CMakeFiles/tests.dir
+C:/variant17/build/CMakeFiles/run.dir
+C:/variant17/build/CMakeFiles/test.dir
+C:/variant17/build/CMakeFiles/edit_cache.dir
+C:/variant17/build/CMakeFiles/rebuild_cache.dir

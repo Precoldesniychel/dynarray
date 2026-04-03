@@ -1,0 +1,7 @@
+{
+    "cmake.configureOnOpen": true,
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.generator": "MinGW Makefiles",
+    "C_Cpp.default.configurationName": "Windows-GCC",
+    "terminal.integrated.defaultProfile.windows": "Command Prompt"
+}

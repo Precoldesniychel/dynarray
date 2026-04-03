@@ -1,0 +1,56 @@
+[
+{
+  "directory": "C:/variant17/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -D_CRT_SECURE_NO_WARNINGS @CMakeFiles/core.dir/includes_C.rsp  -Wall -Wextra -pedantic -g -std=gnu11 -o CMakeFiles\\core.dir\\src\\person.c.obj -c C:\\variant17\\src\\person.c",
+  "file": "C:/variant17/src/person.c",
+  "output": "CMakeFiles/core.dir/src/person.c.obj"
+},
+{
+  "directory": "C:/variant17/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -D_CRT_SECURE_NO_WARNINGS @CMakeFiles/core.dir/includes_C.rsp  -Wall -Wextra -pedantic -g -std=gnu11 -o CMakeFiles\\core.dir\\src\\student.c.obj -c C:\\variant17\\src\\student.c",
+  "file": "C:/variant17/src/student.c",
+  "output": "CMakeFiles/core.dir/src/student.c.obj"
+},
+{
+  "directory": "C:/variant17/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -D_CRT_SECURE_NO_WARNINGS @CMakeFiles/core.dir/includes_C.rsp  -Wall -Wextra -pedantic -g -std=gnu11 -o CMakeFiles\\core.dir\\src\\teacher.c.obj -c C:\\variant17\\src\\teacher.c",
+  "file": "C:/variant17/src/teacher.c",
+  "output": "CMakeFiles/core.dir/src/teacher.c.obj"
+},
+{
+  "directory": "C:/variant17/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -D_CRT_SECURE_NO_WARNINGS @CMakeFiles/core.dir/includes_C.rsp  -Wall -Wextra -pedantic -g -std=gnu11 -o CMakeFiles\\core.dir\\src\\element_info.c.obj -c C:\\variant17\\src\\element_info.c",
+  "file": "C:/variant17/src/element_info.c",
+  "output": "CMakeFiles/core.dir/src/element_info.c.obj"
+},
+{
+  "directory": "C:/variant17/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -D_CRT_SECURE_NO_WARNINGS @CMakeFiles/core.dir/includes_C.rsp  -Wall -Wextra -pedantic -g -std=gnu11 -o CMakeFiles\\core.dir\\src\\dynarray.c.obj -c C:\\variant17\\src\\dynarray.c",
+  "file": "C:/variant17/src/dynarray.c",
+  "output": "CMakeFiles/core.dir/src/dynarray.c.obj"
+},
+{
+  "directory": "C:/variant17/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -D_CRT_SECURE_NO_WARNINGS @CMakeFiles/core.dir/includes_C.rsp  -Wall -Wextra -pedantic -g -std=gnu11 -o CMakeFiles\\core.dir\\src\\operations.c.obj -c C:\\variant17\\src\\operations.c",
+  "file": "C:/variant17/src/operations.c",
+  "output": "CMakeFiles/core.dir/src/operations.c.obj"
+},
+{
+  "directory": "C:/variant17/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -D_CRT_SECURE_NO_WARNINGS @CMakeFiles/v17.dir/includes_C.rsp  -Wall -Wextra -pedantic -g -std=gnu11 -o CMakeFiles\\v17.dir\\main.c.obj -c C:\\variant17\\main.c",
+  "file": "C:/variant17/main.c",
+  "output": "CMakeFiles/v17.dir/main.c.obj"
+},
+{
+  "directory": "C:/variant17/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -D_CRT_SECURE_NO_WARNINGS @CMakeFiles/v17.dir/includes_C.rsp  -Wall -Wextra -pedantic -g -std=gnu11 -o CMakeFiles\\v17.dir\\cli\\interface.c.obj -c C:\\variant17\\cli\\interface.c",
+  "file": "C:/variant17/cli/interface.c",
+  "output": "CMakeFiles/v17.dir/cli/interface.c.obj"
+},
+{
+  "directory": "C:/variant17/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -D_CRT_SECURE_NO_WARNINGS @CMakeFiles/tests.dir/includes_C.rsp  -Wall -Wextra -pedantic -g -std=gnu11 -o CMakeFiles\\tests.dir\\tests\\test_all.c.obj -c C:\\variant17\\tests\\test_all.c",
+  "file": "C:/variant17/tests/test_all.c",
+  "output": "CMakeFiles/tests.dir/tests/test_all.c.obj"
+}
+]
