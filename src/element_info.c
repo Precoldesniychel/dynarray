@@ -1,151 +1,58 @@
-#include "../include/element_info.h"
-#include "../include/person.h"
-#include "../include/student.h"
-#include "../include/teacher.h"
-#include <stdlib.h>
-#include <string.h>
+#include "element_info.h"
+#include <stdlib.h>   // calloc
+#include "person.h"   // для person_*
+#include "student.h"  // для student_*
+#include "teacher.h"  // для teacher_*
 
-static ElementInfo* g_person_ptr_info = NULL;
-static ElementInfo* g_student_ptr_info = NULL;
-static ElementInfo* g_teacher_ptr_info = NULL;
-
-ElementInfo* element_info_create(size_t elem_size,
-                                  void (*destroy)(void*),
-                                  int (*compare)(const void*, const void*),
-                                  void (*print)(const void*, FILE*),
-                                  const char* type_name) {
-    if (elem_size == 0) {
-        return NULL;
-    }
-    
-    ElementInfo* info = calloc(1, sizeof(ElementInfo));
-    if (!info) {
-        return NULL;
-    }
-    
-    info->element_size = elem_size;
-    info->destroy = destroy;
-    info->compare = compare;
-    info->print = print;
-    
-    if (type_name) {
-        info->type_name = strdup(type_name);
-        if (!info->type_name) {
-            free(info);
-            return NULL;
-        }
-    } else {
-        info->type_name = NULL;
-    }
-    
+static ElementInfo* _create_info(size_t sz, void (*d)(void*), void* (*c)(const void*),
+                                 int (*cmp)(const void*, const void*), void (*p)(const void*), ElementType t) {
+    ElementInfo* info = (ElementInfo*)calloc(1, sizeof(ElementInfo));
+    if (!info) return NULL;
+    info->element_size = sz; info->destroy = d; info->copy = c;
+    info->compare = cmp; info->print = p; info->type = t;
     return info;
 }
 
-void element_info_destroy(ElementInfo* info) {
-    if (!info) {
-        return;
-    }
-    
-    free((void*)info->type_name);
-    free(info);
+static ElementInfo* _int_info = NULL;
+ElementInfo* element_info_int(void) {
+    if (!_int_info) _int_info = _create_info(sizeof(int), NULL, NULL, NULL, NULL, TYPE_INT);
+    return _int_info;
 }
 
-ElementInfo* get_person_ptr_info(void) {
-    if (g_person_ptr_info == NULL) {
-        g_person_ptr_info = element_info_create(
-            sizeof(Person*),
-            (void(*)(void*))person_destroy_ptr,
-            (int(*)(const void*, const void*))person_compare_ptr,
-            (void(*)(const void*, FILE*))person_print_ptr,
-            "Person*"
-        );
-    }
-    return g_person_ptr_info;
+static ElementInfo* _double_info = NULL;
+ElementInfo* element_info_double(void) {
+    if (!_double_info) _double_info = _create_info(sizeof(double), NULL, NULL, NULL, NULL, TYPE_DOUBLE);
+    return _double_info;
 }
 
-ElementInfo* get_student_ptr_info(void) {
-    if (g_student_ptr_info == NULL) {
-        g_student_ptr_info = element_info_create(
-            sizeof(Student*),
-            (void(*)(void*))student_destroy_ptr,
-            (int(*)(const void*, const void*))student_compare_ptr,
-            (void(*)(const void*, FILE*))student_print_ptr,
-            "Student*"
-        );
-    }
-    return g_student_ptr_info;
+static ElementInfo* _person_info = NULL;
+ElementInfo* element_info_person(void) {
+    if (!_person_info) _person_info = _create_info(sizeof(Person), (void(*)(void*))person_destroy,
+        (void*(*)(const void*))person_copy, (int(*)(const void*, const void*))person_compare,
+        (void(*)(const void*))person_print, TYPE_PERSON);
+    return _person_info;
 }
 
-ElementInfo* get_teacher_ptr_info(void) {
-    if (g_teacher_ptr_info == NULL) {
-        g_teacher_ptr_info = element_info_create(
-            sizeof(Teacher*),
-            (void(*)(void*))teacher_destroy_ptr,
-            (int(*)(const void*, const void*))teacher_compare_ptr,
-            (void(*)(const void*, FILE*))teacher_print_ptr,
-            "Teacher*"
-        );
-    }
-    return g_teacher_ptr_info;
+static ElementInfo* _student_info = NULL;
+ElementInfo* element_info_student(void) {
+    if (!_student_info) _student_info = _create_info(sizeof(Student), (void(*)(void*))student_destroy,
+        (void*(*)(const void*))student_copy, (int(*)(const void*, const void*))student_compare,
+        (void(*)(const void*))student_print, TYPE_STUDENT);
+    return _student_info;
 }
 
-void person_destroy_ptr(void* elem) {
-    if (elem) {
-        Person* p = *(Person**)elem;
-        if (p) {
-            person_destroy(p);
-        }
-    }
+static ElementInfo* _teacher_info = NULL;
+ElementInfo* element_info_teacher(void) {
+    if (!_teacher_info) _teacher_info = _create_info(sizeof(Teacher), (void(*)(void*))teacher_destroy,
+        (void*(*)(const void*))teacher_copy, (int(*)(const void*, const void*))teacher_compare,
+        (void(*)(const void*))teacher_print, TYPE_TEACHER);
+    return _teacher_info;
 }
 
-void person_print_ptr(const void* elem, FILE* out) {
-    if (elem && out) {
-        const Person* p = *(const Person* const*)elem;
-        if (p) {
-            person_print((Person*)p, out);
-        } else {
-            fprintf(out, "<NULL>");
-        }
-    }
-}
-
-int person_compare_ptr(const void* a, const void* b) {
-    if (!a && !b) return 0;
-    if (!a) return -1;
-    if (!b) return 1;
-    
-    const Person* pa = *(const Person* const*)a;
-    const Person* pb = *(const Person* const*)b;
-    
-    return person_compare((Person*)pa, (Person*)pb);
-}
-
-int element_info_compare(const ElementInfo* a, const ElementInfo* b) {
-    if (!a && !b) return 0;
-    if (!a) return -1;
-    if (!b) return 1;
-    
-    if (a->element_size != b->element_size) {
-        return (a->element_size < b->element_size) ? -1 : 1;
-    }
-    
-    if (a->destroy != b->destroy) return -1;
-    if (a->compare != b->compare) return -1;
-    if (a->print != b->print) return -1;
-    
-    return 0;
-}
-
-int element_info_is_compatible(const ElementInfo* a, const ElementInfo* b) {
-    if (!a || !b) return 0;
-    
-    if (a == b) return 1;
-    
-    if (a == get_person_ptr_info()) {
-        return (b == get_person_ptr_info() ||
-                b == get_student_ptr_info() ||
-                b == get_teacher_ptr_info());
-    }
-    
-    return 0;
+bool element_info_is_compatible(const ElementInfo* a, const ElementInfo* b) {
+    if (!a || !b) return false;
+    if (a->type == b->type) return true;
+    if ((a->type == TYPE_PERSON && (b->type == TYPE_STUDENT || b->type == TYPE_TEACHER)) ||
+        (b->type == TYPE_PERSON && (a->type == TYPE_STUDENT || a->type == TYPE_TEACHER))) return true;
+    return false;
 }

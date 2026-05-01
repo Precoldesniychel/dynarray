@@ -1,36 +1,23 @@
 #ifndef TEACHER_H
 #define TEACHER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "person.h"
 
-typedef struct {
-    Person base;
-    char* department;
-    char* position;
-    int experience_years;
-    double salary;
-} Teacher;
+typedef struct Teacher { Person base; int experience_years; char* subject; } Teacher;
 
-Teacher* teacher_create(PersonID id,
-                        const char* firstName,
-                        const char* middleName,
-                        const char* lastName,
-                        time_t birthDate,
-                        const char* department,
-                        const char* position,
-                        int experience_years,
-                        double salary);
-
+Teacher* teacher_create(const char* full_name, int age, int id, int exp, const char* subject);
 void teacher_destroy(Teacher* t);
+void* teacher_copy(const void* src);
+int teacher_compare(const void* a, const void* b);
+void teacher_print(const void* t);
+int teacher_is_senior(const Teacher* t);
 
-void teacher_print(Teacher* t, FILE* out);
-int teacher_compare(Teacher* a, Teacher* b);
-int teacher_is_senior(Teacher* t);
-
-ElementInfo* get_teacher_ptr_info(void);
-
-void teacher_destroy_ptr(void* elem);
-void teacher_print_ptr(const void* elem, FILE* out);
-int teacher_compare_ptr(const void* a, const void* b);
-
+#ifdef __cplusplus
+}
 #endif
+
+#endif // TEACHER_H

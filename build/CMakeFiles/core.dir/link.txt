@@ -1,2 +1,0 @@
-C:\msys64\ucrt64\bin\ar.exe qc libcore.a CMakeFiles/core.dir/src/person.c.obj CMakeFiles/core.dir/src/student.c.obj CMakeFiles/core.dir/src/teacher.c.obj CMakeFiles/core.dir/src/element_info.c.obj CMakeFiles/core.dir/src/dynarray.c.obj CMakeFiles/core.dir/src/operations.c.obj
-C:\msys64\ucrt64\bin\ranlib.exe libcore.a
