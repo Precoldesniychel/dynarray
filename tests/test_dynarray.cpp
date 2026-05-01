@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "dynarray.h"
 #include "element_info.h"
-#include "student.h" // Добавлено для типа Student
+#include "student.h" 
 
 TEST(DynArrayTest, CreateAndDestroy) {
     DynArray* arr = array_create(element_info_student());
@@ -22,8 +22,8 @@ TEST(DynArrayTest, PushGetAndOwnership) {
     Student* retrieved = static_cast<Student*>(array_get(arr, 0));
     ASSERT_NE(retrieved, nullptr);
     EXPECT_STREQ(retrieved->base.full_name, "Test Student");
-    EXPECT_DOUBLE_EQ(retrieved->gpa, 4.5); // Исправлено на EXPECT_DOUBLE_EQ
-    EXPECT_NE(retrieved, &s); // Проверка владения копией
+    EXPECT_DOUBLE_EQ(retrieved->gpa, 4.5); 
+    EXPECT_NE(retrieved, &s); 
     
     array_destroy(arr);
 }

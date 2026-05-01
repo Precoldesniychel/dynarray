@@ -79,7 +79,7 @@ DynArray* array_map(const DynArray* arr, MapFunc func) {
             array_destroy(res);
             return NULL;
         }
-        arr->info->destroy(new_elem); // Освобождаем временный объект, массив хранит свою копию
+        arr->info->destroy(new_elem); 
     }
     return res;
 }

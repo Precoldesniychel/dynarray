@@ -39,4 +39,4 @@ DynArray* array_concat(const DynArray* a, const DynArray* b);
 }
 #endif
 
-#endif // DYNARRAY_H
+#endif 

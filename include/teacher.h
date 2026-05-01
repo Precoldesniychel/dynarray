@@ -24,4 +24,4 @@ int teacher_is_senior(const Teacher* t);
 }
 #endif
 
-#endif // TEACHER_H
+#endif 

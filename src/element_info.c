@@ -17,7 +17,7 @@ static ElementInfo* _create_info(size_t sz, void* (*cl)(const void*), void (*dst
     return info;
 }
 
-// Ленивая инициализация с мемоизацией (объект-как-глобальная-константа)
+
 static ElementInfo* _person_info = NULL;
 ElementInfo* element_info_person(void) {
     if (!_person_info) _person_info = _create_info(sizeof(Person), person_clone, (void(*)(void*))person_destroy, person_compare, person_print, TYPE_PERSON);

@@ -31,4 +31,4 @@ int element_info_is_compatible(const ElementInfo* a, const ElementInfo* b);
 }
 #endif
 
-#endif // ELEMENT_INFO_H
+#endif 

@@ -6,7 +6,7 @@
 #include "student.h"
 #include "teacher.h"
 
-/* === Вспомогательные функции для операций (чистый C) === */
+
 static void* map_increment_gpa(const void* p) {
     if (((const Person*)p)->age >= 30) return person_clone(p);
     Student* s = student_clone(p);
@@ -22,7 +22,7 @@ static int filter_senior(const void* p) {
     return ((const Person*)p)->age >= 30 && ((const Teacher*)p)->experience_years >= 10;
 }
 
-/* === Утилиты ввода === */
+
 static int read_int(const char* prompt, int min, int max, int* out) {
     char buf[64];
     printf("%s", prompt);
@@ -45,7 +45,7 @@ static int read_double(const char* prompt, double min, double max, double* out) 
     return 0;
 }
 
-/* === Вывод === */
+
 static void print_array(const DynArray* arr, const char* title) {
     printf("\n=== %s (Size: %zu) ===\n", title, array_size(arr));
     for (size_t i = 0; i < array_size(arr); ++i) {
@@ -70,7 +70,7 @@ static void load_demo(DynArray* arr) {
     }
 }
 
-/* === Главный интерфейс === */
+
 void run_interface(void) {
     DynArray* people = array_create(element_info_person());
     if (!people) { printf("Error: Failed to create array.\n"); return; }
