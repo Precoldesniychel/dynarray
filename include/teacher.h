@@ -7,11 +7,15 @@ extern "C" {
 
 #include "person.h"
 
-typedef struct Teacher { Person base; int experience_years; char* subject; } Teacher;
+typedef struct Teacher {
+    Person base;
+    int experience_years;
+    char* subject;
+} Teacher;
 
 Teacher* teacher_create(const char* full_name, int age, int id, int exp, const char* subject);
 void teacher_destroy(Teacher* t);
-void* teacher_copy(const void* src);
+void* teacher_clone(const void* src);
 int teacher_compare(const void* a, const void* b);
 void teacher_print(const void* t);
 int teacher_is_senior(const Teacher* t);
@@ -20,4 +24,4 @@ int teacher_is_senior(const Teacher* t);
 }
 #endif
 
-#endif 
+#endif // TEACHER_H

@@ -16,9 +16,6 @@
     <ClCompile Include="C:\Labs\variant17\src\teacher.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Labs\variant17\src\operations.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Labs\variant17\CMakeLists.txt" />

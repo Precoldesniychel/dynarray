@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,193 +6,152 @@
 #include "student.h"
 #include "teacher.h"
 
-static char* input_str(const char* prompt) {
-    char buf[256];
+/* === Вспомогательные функции для операций (чистый C) === */
+static void* map_increment_gpa(const void* p) {
+    if (((const Person*)p)->age >= 30) return person_clone(p);
+    Student* s = student_clone(p);
+    s->gpa += 0.1; if(s->gpa > 5.0) s->gpa = 5.0;
+    return s;
+}
+
+static int filter_excellent(const void* p) {
+    return ((const Person*)p)->age < 30 && ((const Student*)p)->gpa >= 4.5;
+}
+
+static int filter_senior(const void* p) {
+    return ((const Person*)p)->age >= 30 && ((const Teacher*)p)->experience_years >= 10;
+}
+
+/* === Утилиты ввода === */
+static int read_int(const char* prompt, int min, int max, int* out) {
+    char buf[64];
     printf("%s", prompt);
-    if (!fgets(buf, sizeof(buf), stdin)) return NULL;
-    buf[strcspn(buf, "\n")] = '\0';
-    return _strdup(buf);
+    if (!fgets(buf, sizeof(buf), stdin)) return -1;
+    char* end;
+    long val = strtol(buf, &end, 10);
+    if (end == buf || *end != '\n' || val < min || val > max) return -1;
+    *out = (int)val;
+    return 0;
 }
 
-static bool filter_excellent(const void* p) {
-    return student_is_excellent((const Student*)p);
+static int read_double(const char* prompt, double min, double max, double* out) {
+    char buf[64];
+    printf("%s", prompt);
+    if (!fgets(buf, sizeof(buf), stdin)) return -1;
+    char* end;
+    double val = strtod(buf, &end);
+    if (end == buf || *end != '\n' || val < min || val > max) return -1;
+    *out = val;
+    return 0;
 }
 
-static bool filter_senior(const void* p) {
-    return teacher_is_senior((const Teacher*)p);
-}
-
-static void* count_inc(void* acc, void* elem) { (void)elem; (*(int*)acc)++; return acc; }
-
-static void print_all(const DynArray* arr, const char* title) {
+/* === Вывод === */
+static void print_array(const DynArray* arr, const char* title) {
     printf("\n=== %s (Size: %zu) ===\n", title, array_size(arr));
     for (size_t i = 0; i < array_size(arr); ++i) {
-        void* elem = array_get((DynArray*)arr, i);
-        if (elem) person_print(elem);
+        void* p = array_get(arr, i);
+        if (p) person_print(p);
     }
 }
 
-static void load_test_data(DynArray* arr) {
-    if (!arr) return;
-    array_push(arr, student_create("Ivanov Ivan", 20, 1, 4.8));
-    array_push(arr, student_create("Petrova Anna", 19, 2, 3.9));
-    array_push(arr, student_create("Sidorov Alex", 21, 3, 4.5));
-    array_push(arr, student_create("Kuznetsova Maria", 18, 4, 5.0));
-    array_push(arr, student_create("Smirnov Dmitry", 22, 5, 4.2));
-    array_push(arr, student_create("Popova Elena", 20, 6, 4.7));
-    array_push(arr, student_create("Volkov Sergey", 19, 7, 3.5));
-    array_push(arr, student_create("Novikova Olga", 21, 8, 4.9));
-    array_push(arr, student_create("Mikhailov Pavel", 20, 9, 4.1));
-    array_push(arr, student_create("Fedorova Tatiana", 22, 10, 4.6));
-    array_push(arr, teacher_create("Sidorov Petr", 45, 11, 15, "Math"));
-    array_push(arr, teacher_create("Kozlova Maria", 38, 12, 5, "Physics"));
-    array_push(arr, teacher_create("Volkov Igor", 52, 13, 20, "History"));
-    array_push(arr, teacher_create("Lebedeva Svetlana", 41, 14, 8, "Biology"));
-    array_push(arr, teacher_create("Orlov Andrey", 35, 15, 3, "Chemistry"));
-
-    printf("Loaded demo data: 10 students, 5 teachers (15 total).\n");
-}
-
-static void run_demo_tests(DynArray* mixed) {
-    printf("\n=== Running Automated Demo Tests ===\n");
-    printf("\n[1] Filtering students with GPA >= 4.5:\n");
-    int ex_cnt = 0;
-    for(size_t i=0; i<array_size(mixed); ++i) {
-        void* p = array_get((DynArray*)mixed, i);
-        if(!p) continue;
-        Person* person = (Person*)p;
-        if(person->age < 30 && student_is_excellent((Student*)p)) {
-            ex_cnt++;
-            printf("  - Found: %s (GPA: %.2f)\n", person->full_name ? person->full_name : "N/A", ((Student*)p)->gpa);
-        }
-    }
-    printf("Result: %d excellent students found.\n", ex_cnt);
-    printf("\n[2] Filtering teachers with Experience >= 10 years:\n");
-    int sen_cnt = 0;
-    for(size_t i=0; i<array_size(mixed); ++i) {
-        void* p = array_get((DynArray*)mixed, i);
-        if(!p) continue;
-        Person* person = (Person*)p;
-        if(person->age >= 30 && teacher_is_senior((Teacher*)p)) {
-            sen_cnt++;
-            printf("  - Found: %s (Exp: %d years)\n", person->full_name ? person->full_name : "N/A", ((Teacher*)p)->experience_years);
-        }
-    }
-    printf("Result: %d senior teachers found.\n", sen_cnt);
-    printf("\n[3] Testing Concatenation (array + empty array):\n");
-    printf("  - Mechanism: Creates a NEW DynArray structure.\n");
-    printf("  - Copies pointers from the first array, then from the second.\n");
-    printf("  - Performs a SHALLOW COPY: elements are shared, memory is NOT duplicated.\n");
-    printf("  - Type compatibility is checked before merging.\n");
+static void load_demo(DynArray* arr) {
+    Student s1 = {{"Ivanov", 20, 1}, 4.8};
+    Student s2 = {{"Petrov", 19, 2}, 3.9};
+    Student s3 = {{"Sidorov", 21, 3}, 4.5};
+    Teacher t1 = {{"Kozlov", 45, 4}, 15, "Math"};
+    Teacher t2 = {{"Volkov", 38, 5}, 5, "Physics"};
     
-    DynArray* empty = array_create(element_info_person());
-    DynArray* merged = array_concat(mixed, empty);
-    printf("  - Original size: %zu\n", array_size(mixed));
-    printf("  - Empty size: %zu\n", array_size(empty));
-    printf("  - Merged size: %zu (Expected: %zu)\n", array_size(merged), array_size(mixed) + array_size(empty));
-
-    if(merged) { free(merged->data); free(merged); }
-    array_destroy(empty);
-
-    printf("\n[4] Testing Reduce (Count elements):\n");
-    int cnt = 0;
-    array_reduce(mixed, count_inc, &cnt);
-    printf("  - Iterated over %zu elements using reduce().\n", array_size(mixed));
-    printf("  - Final accumulator value: %d\n", cnt);
-
-    printf("\n[5] Testing Clear & Reload:\n");
-    array_clear(mixed);
-    printf("  - Size after array_clear(): %zu\n", array_size(mixed));
-    load_test_data(mixed);
-
-    printf("\n=== All Demo Tests Completed Successfully ===\n");
+    if (array_push(arr, &s1) != 0 || array_push(arr, &s2) != 0 || 
+        array_push(arr, &s3) != 0 || array_push(arr, &t1) != 0 || 
+        array_push(arr, &t2) != 0) {
+        printf("Error: Failed to load demo data.\n");
+    } else {
+        printf("Demo data loaded: 3 Students, 2 Teachers.\n");
+    }
 }
 
+/* === Главный интерфейс === */
 void run_interface(void) {
     DynArray* people = array_create(element_info_person());
-    if (!people) { printf("Error creating array.\n"); return; }
+    if (!people) { printf("Error: Failed to create array.\n"); return; }
+    load_demo(people);
 
-    load_test_data(people);
-
-    int choice = 0;
     while (1) {
-        printf("\n--- Polymorphic Dynamic Array (Variant 17) ---\n");
-        printf("1. Add Student\n");
-        printf("2. Add Teacher\n");
-        printf("3. Show All\n");
-        printf("4. Filter: Excellent Students (GPA >= 4.5)\n");
-        printf("5. Filter: Senior Teachers (Exp >= 10)\n");
-        printf("6. Concatenation\n");
-        printf("7. Clear Array\n");
-        printf("8. Run Automated Tests\n");
-        printf("9. Reload Demo Data\n");
-        printf("0. Exit\n");
-        printf("Choice: ");
-
-        if (scanf("%d", &choice) != 1) { while(getchar()!='\n'); continue; }
-        while(getchar()!='\n');
+        printf("\n--- Variant 17: Polymorphic Dynamic Array ---\n");
+        printf("1. Add Student\n2. Add Teacher\n3. Show All\n");
+        printf("4. Map: Increment GPA (Students)\n");
+        printf("5. Where: Excellent Students (GPA >= 4.5)\n");
+        printf("6. Where: Senior Teachers (Exp >= 10)\n");
+        printf("7. Concat: Merge Arrays\n8. Clear\n9. Reload Demo\n0. Exit\nChoice: ");
+        
+        int choice;
+        if (read_int("", 0, 9, &choice) != 0) {
+            printf("Invalid input. Please enter a number.\n");
+            while(getchar() != '\n');
+            continue;
+        }
 
         switch (choice) {
             case 1: {
-                char* name = input_str("Full Name: ");
-                int age=20; double gpa=4.0;
-                printf("Age: "); scanf("%d",&age); while(getchar()!='\n');
-                printf("GPA: "); scanf("%lf",&gpa); while(getchar()!='\n');
-                Student* s = student_create(name ? name : "Unknown", age, (int)array_size(people)+1, gpa);
-                if(s) array_push(people, s);
-                free(name); break;
+                char name[128]; int age, id; double gpa;
+                printf("Name: "); fgets(name, sizeof(name), stdin); name[strcspn(name, "\n")] = 0;
+                if (read_int("Age: ", 16, 100, &age) != 0 || 
+                    read_int("ID: ", 1, 9999, &id) != 0 || 
+                    read_double("GPA: ", 0.0, 5.0, &gpa) != 0) {
+                    printf("Invalid input.\n"); break;
+                }
+                Student s = {{name, age, id}, gpa};
+                if (array_push(people, &s) != 0) printf("Error adding student.\n");
+                else printf("Student added.\n");
+                break;
             }
             case 2: {
-                char* name = input_str("Full Name: ");
-                int age=40, exp=5;
-                printf("Age: "); scanf("%d",&age); while(getchar()!='\n');
-                printf("Experience (years): "); scanf("%d",&exp); while(getchar()!='\n');
-                Teacher* t = teacher_create(name ? name : "Unknown", age, (int)array_size(people)+1, exp, "CS");
-                if(t) array_push(people, t);
-                free(name); break;
-            }
-            case 3: print_all(people, "All Records"); break;
-            case 4: {
-                printf("\nFiltering Excellent Students (GPA >= 4.5):\n");
-                int cnt = 0;
-                for(size_t i=0; i<array_size(people); ++i) {
-                    void* p = array_get((DynArray*)people, i);
-                    if(p && ((Person*)p)->age < 30 && student_is_excellent((Student*)p)) {
-                        printf(" - %s (GPA: %.2f)\n", ((Person*)p)->full_name, ((Student*)p)->gpa);
-                        cnt++;
-                    }
+                char name[128], subj[64]; int age, id, exp;
+                printf("Name: "); fgets(name, sizeof(name), stdin); name[strcspn(name, "\n")] = 0;
+                if (read_int("Age: ", 16, 100, &age) != 0 || 
+                    read_int("ID: ", 1, 9999, &id) != 0 || 
+                    read_int("Experience: ", 0, 50, &exp) != 0) {
+                    printf("Invalid input.\n"); break;
                 }
-                printf("Found %d excellent students.\n", cnt);
+                printf("Subject: "); fgets(subj, sizeof(subj), stdin); subj[strcspn(subj, "\n")] = 0;
+                Teacher t = {{name, age, id}, exp, subj};
+                if (array_push(people, &t) != 0) printf("Error adding teacher.\n");
+                else printf("Teacher added.\n");
+                break;
+            }
+            case 3: print_array(people, "All Records"); break;
+            case 4: {
+                DynArray* mapped = array_map(people, map_increment_gpa);
+                if (!mapped) printf("Map failed.\n");
+                else { print_array(mapped, "Mapped (GPA +0.1)"); array_destroy(mapped); }
                 break;
             }
             case 5: {
-                printf("\nFiltering Senior Teachers (Exp >= 10):\n");
-                int cnt = 0;
-                for(size_t i=0; i<array_size(people); ++i) {
-                    void* p = array_get((DynArray*)people, i);
-                    if(p && ((Person*)p)->age >= 30 && teacher_is_senior((Teacher*)p)) {
-                        printf(" - %s (Exp: %d yrs)\n", ((Person*)p)->full_name, ((Teacher*)p)->experience_years);
-                        cnt++;
-                    }
-                }
-                printf("Found %d senior teachers.\n", cnt);
+                DynArray* res = array_where(people, filter_excellent);
+                if (!res) printf("Where failed.\n");
+                else { print_array(res, "Excellent Students"); array_destroy(res); }
                 break;
             }
             case 6: {
-                printf("\nConcatenation:\n");
-                printf("Creating empty array...\n");
-                DynArray* e = array_create(element_info_person());
-                printf("Calling array_concat(main, empty)...\n");
-                DynArray* c = array_concat(people, e);
-                printf("Result size: %zu (Original: %zu + Empty: %zu)\n", array_size(c), array_size(people), array_size(e));
-                if(c) { free(c->data); free(c); }
-                array_destroy(e);
+                DynArray* res = array_where(people, filter_senior);
+                if (!res) printf("Where failed.\n");
+                else { print_array(res, "Senior Teachers"); array_destroy(res); }
                 break;
             }
-            case 7: array_clear(people); printf("Array cleared.\n"); break;
-            case 8: run_demo_tests(people); break;
-            case 9: array_clear(people); load_test_data(people); break;
-            case 0: array_destroy(people); printf("Exiting...\n"); return;
+            case 7: {
+                DynArray* empty = array_create(element_info_person());
+                DynArray* concat = array_concat(people, empty);
+                if (!concat) printf("Concat failed.\n");
+                else {
+                    printf("Concat successful. New size: %zu\n", array_size(concat));
+                    array_destroy(concat);
+                }
+                array_destroy(empty);
+                break;
+            }
+            case 8: array_clear(people); printf("Array cleared.\n"); break;
+            case 9: array_clear(people); load_demo(people); break;
+            case 0: array_destroy(people); printf("Exit.\n"); return;
             default: printf("Invalid option.\n");
         }
     }

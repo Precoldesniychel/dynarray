@@ -1,13 +1,16 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "student.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-Student* student_create(const char* name, int age, int id, double gpa) {
-    Student* s = (Student*)calloc(1, sizeof(Student));
+Student* student_create(const char* full_name, int age, int id, double gpa) {
+    Student* s = malloc(sizeof(Student));
     if (!s) return NULL;
-    if (name) s->base.full_name = _strdup(name);
+#ifdef _MSC_VER
+    s->base.full_name = full_name ? _strdup(full_name) : NULL;
+#else
+    s->base.full_name = full_name ? strdup(full_name) : NULL;
+#endif
     s->base.age = age;
     s->base.id = id;
     s->gpa = gpa;
@@ -15,10 +18,12 @@ Student* student_create(const char* name, int age, int id, double gpa) {
 }
 
 void student_destroy(Student* s) {
-    if (s) { free(s->base.full_name); free(s); }
+    if (!s) return;
+    free(s->base.full_name);
+    free(s);
 }
 
-void* student_copy(const void* src) {
+void* student_clone(const void* src) {
     if (!src) return NULL;
     const Student* st = (const Student*)src;
     return student_create(st->base.full_name, st->base.age, st->base.id, st->gpa);
@@ -36,8 +41,7 @@ int student_compare(const void* a, const void* b) {
 void student_print(const void* s) {
     if (!s) return;
     const Student* x = (const Student*)s;
-    printf("[Student] ID: %d, Name: %s, Age: %d, GPA: %.2f\n",
-           x->base.id, x->base.full_name ? x->base.full_name : "N/A", x->base.age, x->gpa);
+    printf("[Student] ID: %d, Name: %s, Age: %d, GPA: %.2f\n", x->base.id, x->base.full_name ? x->base.full_name : "N/A", x->base.age, x->gpa);
 }
 
 int student_is_excellent(const Student* s) {

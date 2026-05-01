@@ -7,11 +7,14 @@ extern "C" {
 
 #include "person.h"
 
-typedef struct Student { Person base; double gpa; } Student;
+typedef struct Student {
+    Person base;
+    double gpa;
+} Student;
 
 Student* student_create(const char* full_name, int age, int id, double gpa);
 void student_destroy(Student* s);
-void* student_copy(const void* src);
+void* student_clone(const void* src);
 int student_compare(const void* a, const void* b);
 void student_print(const void* s);
 int student_is_excellent(const Student* s);
@@ -20,4 +23,4 @@ int student_is_excellent(const Student* s);
 }
 #endif
 
-#endif 
+#endif // STUDENT_H
