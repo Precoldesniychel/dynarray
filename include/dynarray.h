@@ -44,4 +44,4 @@ void* array_reduce(const DynArray* arr, ReduceFunc func, void* initial);
 }
 #endif
 
-#endif // DYNARRAY_H
+#endif 

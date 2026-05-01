@@ -35,7 +35,6 @@ static void print_all(const DynArray* arr, const char* title) {
 
 static void load_test_data(DynArray* arr) {
     if (!arr) return;
-    // 10 Студентов
     array_push(arr, student_create("Ivanov Ivan", 20, 1, 4.8));
     array_push(arr, student_create("Petrova Anna", 19, 2, 3.9));
     array_push(arr, student_create("Sidorov Alex", 21, 3, 4.5));
@@ -46,7 +45,6 @@ static void load_test_data(DynArray* arr) {
     array_push(arr, student_create("Novikova Olga", 21, 8, 4.9));
     array_push(arr, student_create("Mikhailov Pavel", 20, 9, 4.1));
     array_push(arr, student_create("Fedorova Tatiana", 22, 10, 4.6));
-    // 5 Преподавателей
     array_push(arr, teacher_create("Sidorov Petr", 45, 11, 15, "Math"));
     array_push(arr, teacher_create("Kozlova Maria", 38, 12, 5, "Physics"));
     array_push(arr, teacher_create("Volkov Igor", 52, 13, 20, "History"));
@@ -58,8 +56,6 @@ static void load_test_data(DynArray* arr) {
 
 static void run_demo_tests(DynArray* mixed) {
     printf("\n=== Running Automated Demo Tests ===\n");
-
-    // 1. Фильтрация отличников
     printf("\n[1] Filtering students with GPA >= 4.5:\n");
     int ex_cnt = 0;
     for(size_t i=0; i<array_size(mixed); ++i) {
@@ -72,8 +68,6 @@ static void run_demo_tests(DynArray* mixed) {
         }
     }
     printf("Result: %d excellent students found.\n", ex_cnt);
-
-    // 2. Фильтрация опытных преподавателей
     printf("\n[2] Filtering teachers with Experience >= 10 years:\n");
     int sen_cnt = 0;
     for(size_t i=0; i<array_size(mixed); ++i) {
@@ -86,8 +80,6 @@ static void run_demo_tests(DynArray* mixed) {
         }
     }
     printf("Result: %d senior teachers found.\n", sen_cnt);
-
-    // 3. Конкатенация с подробным объяснением
     printf("\n[3] Testing Concatenation (array + empty array):\n");
     printf("  - Mechanism: Creates a NEW DynArray structure.\n");
     printf("  - Copies pointers from the first array, then from the second.\n");
@@ -99,19 +91,16 @@ static void run_demo_tests(DynArray* mixed) {
     printf("  - Original size: %zu\n", array_size(mixed));
     printf("  - Empty size: %zu\n", array_size(empty));
     printf("  - Merged size: %zu (Expected: %zu)\n", array_size(merged), array_size(mixed) + array_size(empty));
-    
-    // Безопасная очистка view-массива (только структура, не элементы)
+
     if(merged) { free(merged->data); free(merged); }
     array_destroy(empty);
 
-    // 4. Reduce
     printf("\n[4] Testing Reduce (Count elements):\n");
     int cnt = 0;
     array_reduce(mixed, count_inc, &cnt);
     printf("  - Iterated over %zu elements using reduce().\n", array_size(mixed));
     printf("  - Final accumulator value: %d\n", cnt);
 
-    // 5. Очистка и перезагрузка
     printf("\n[5] Testing Clear & Reload:\n");
     array_clear(mixed);
     printf("  - Size after array_clear(): %zu\n", array_size(mixed));
@@ -134,7 +123,7 @@ void run_interface(void) {
         printf("3. Show All\n");
         printf("4. Filter: Excellent Students (GPA >= 4.5)\n");
         printf("5. Filter: Senior Teachers (Exp >= 10)\n");
-        printf("6. Demo: Concatenation\n");
+        printf("6. Concatenation\n");
         printf("7. Clear Array\n");
         printf("8. Run Automated Tests\n");
         printf("9. Reload Demo Data\n");
@@ -191,13 +180,12 @@ void run_interface(void) {
                 break;
             }
             case 6: {
-                printf("\nConcatenation Demo:\n");
+                printf("\nConcatenation:\n");
                 printf("Creating empty array...\n");
                 DynArray* e = array_create(element_info_person());
                 printf("Calling array_concat(main, empty)...\n");
                 DynArray* c = array_concat(people, e);
                 printf("Result size: %zu (Original: %zu + Empty: %zu)\n", array_size(c), array_size(people), array_size(e));
-                printf("Note: Concat performs a shallow copy. Pointers are shared, objects are NOT duplicated.\n");
                 if(c) { free(c->data); free(c); }
                 array_destroy(e);
                 break;

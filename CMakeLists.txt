@@ -14,20 +14,20 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-# 1. Статическая библиотека
+
 add_library(dynarray_static STATIC
     src/dynarray.c src/element_info.c src/person.c
     src/student.c src/teacher.c src/operations.c
 )
 
-# 2. Основная программа
+
 add_executable(v17 main.c cli/interface.c)
 target_link_libraries(v17 PRIVATE dynarray_static)
 if(MSVC)
     target_compile_definitions(v17 PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 
-# 3. Google Test (ОБЯЗАТЕЛЬНО ДО add_subdirectory(tests)!)
+
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -38,5 +38,5 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# 4. Тесты
+
 add_subdirectory(tests)

@@ -20,4 +20,4 @@ int student_is_excellent(const Student* s);
 }
 #endif
 
-#endif // STUDENT_H
+#endif 

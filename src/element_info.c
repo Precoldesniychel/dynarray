@@ -1,8 +1,8 @@
 #include "element_info.h"
-#include <stdlib.h>   // calloc
-#include "person.h"   // для person_*
-#include "student.h"  // для student_*
-#include "teacher.h"  // для teacher_*
+#include <stdlib.h>   
+#include "person.h"   
+#include "student.h"  
+#include "teacher.h"  
 
 static ElementInfo* _create_info(size_t sz, void (*d)(void*), void* (*c)(const void*),
                                  int (*cmp)(const void*, const void*), void (*p)(const void*), ElementType t) {

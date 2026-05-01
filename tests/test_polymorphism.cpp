@@ -13,7 +13,7 @@ TEST(PolymorphismTest, MixedArrayOperations) {
     ASSERT_EQ(array_push(people, t), 0);
     EXPECT_EQ(array_size(people), 2);
     
-    // Проверяем полиморфный вывод (визуально в консоли)
+
     for(size_t i=0; i<array_size(people); ++i) {
         void* p = array_get(people, i);
         ASSERT_NE(p, nullptr);

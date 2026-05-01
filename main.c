@@ -7,7 +7,6 @@
 void run_interface(void);
 
 int main(int argc, char* argv[]) {
-    // Корректный вывод кириллицы в современных терминалах Windows
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
 

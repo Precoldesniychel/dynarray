@@ -1,6 +1,6 @@
 #include "dynarray.h"
-#include <stdlib.h>   // calloc, realloc, free
-#include <string.h>   // memmove
+#include <stdlib.h>   
+#include <string.h>   
 
 static int _grow(DynArray* arr) {
     if (!arr) return -1;

@@ -4,14 +4,14 @@
 #include "student.h"
 #include "person.h"
 
-// Фильтр для where
+
 static bool is_excellent(const void* p) {
     return ((const Student*)p)->gpa >= 4.5;
 }
 
 TEST(OperationsTest, WhereFilter) {
     DynArray* arr = array_create(element_info_student());
-    // Используем новые объекты, чтобы array_destroy мог их корректно удалить
+
     array_push(arr, student_create("A", 20, 1, 3.5));
     array_push(arr, student_create("B", 20, 2, 5.0));
     array_push(arr, student_create("C", 20, 3, 4.7));
@@ -20,13 +20,11 @@ TEST(OperationsTest, WhereFilter) {
     ASSERT_NE(filtered, nullptr);
     EXPECT_EQ(array_size(filtered), 2); 
     
-    // ⚠️ ВАЖНО: filtered содержит те же указатели, что и arr.
-    // Нельзя вызывать array_destroy(filtered), иначе объекты удалятся дважды.
-    // Освобождаем только структуру массива (массив указателей), но не сами объекты.
+
     free(filtered->data);
     free(filtered);
     
-    // Теперь безопасно удаляем оригинал
+
     array_destroy(arr);
 }
 
@@ -45,7 +43,7 @@ TEST(OperationsTest, MapTransform) {
     ASSERT_NE(res, nullptr);
     EXPECT_EQ(res->base.id, 110);
 
-    // Безопасная очистка результата map
+
     free(mapped->data);
     free(mapped);
     
