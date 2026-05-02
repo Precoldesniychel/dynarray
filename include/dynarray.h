@@ -9,7 +9,7 @@ extern "C" {
 #include "element_info.h"
 
 typedef struct {
-    void* data;              // Единый буфер для всех объектов (не массив указателей!)
+    void* data;              
     size_t size;
     size_t capacity;
     ElementInfo* info;
@@ -21,10 +21,10 @@ typedef int   (*WhereFunc)(const void*);
 DynArray* array_create(ElementInfo* info);
 void array_destroy(DynArray* arr);
 
-// Копирует объект src в конец массива (в единый буфер)
+
 int array_push(DynArray* arr, const void* src);
 
-// Возвращает указатель на объект внутри буфера (не копию!)
+
 void* array_get(const DynArray* arr, size_t index);
 
 size_t array_size(const DynArray* arr);
@@ -41,4 +41,4 @@ DynArray* array_concat(const DynArray* a, const DynArray* b);
 }
 #endif
 
-#endif // DYNARRAY_H
+#endif 

@@ -15,13 +15,13 @@ TEST(DynArrayTest, PushGetAndContiguousStorage) {
     DynArray* arr = array_create(element_info_student());
     Student s = {{"Test Student", 20, 1}, 4.5};
     
-    // array_push принимает 2 аргумента: массив и источник данных
+
     EXPECT_EQ(array_push(arr, &s), 0);
 
     EXPECT_EQ(array_size(arr), 1);
     EXPECT_GT(array_capacity(arr), 0);
 
-    // array_get возвращает указатель прямо в единый буфер массива
+
     Student* retrieved = static_cast<Student*>(array_get(arr, 0));
     ASSERT_NE(retrieved, nullptr);
     EXPECT_STREQ(retrieved->base.full_name, "Test Student");

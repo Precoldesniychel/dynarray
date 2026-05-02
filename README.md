@@ -125,4 +125,18 @@ cd C:\Labs\variant17\build
 
 cmake --build . --config Release
 
+.\Release\run_tests.exe 
+
 .\Release\run_tests.exe --gtest_filter="*ConcatThreeTypesThenMap*"
+
+
+
+cd C:\Labs\variant17
+
+git status
+
+git add .
+
+git commit -m "Update"
+
+git push origin main

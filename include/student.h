@@ -1,16 +1,16 @@
 #ifndef STUDENT_H
 #define STUDENT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "person.h"
 
-typedef struct Student {
+typedef struct {
     Person base;
     double gpa;
 } Student;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 Student* student_create(const char* full_name, int age, int id, double gpa);
 void student_destroy(Student* s);
@@ -23,4 +23,4 @@ int student_is_excellent(const Student* s);
 }
 #endif
 
-#endif 
+#endif

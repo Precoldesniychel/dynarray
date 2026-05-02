@@ -2,12 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Вспомогательная: вычисляет смещение к элементу в байтах
 static inline size_t _offset(const DynArray* arr, size_t index) {
     return index * arr->info->element_size;
 }
 
-// Вспомогательная: расширяет буфер
 static int _grow(DynArray* arr) {
     size_t new_cap = (arr->capacity == 0) ? 4 : arr->capacity * 2;
     size_t new_bytes = new_cap * arr->info->element_size;
@@ -31,12 +29,6 @@ DynArray* array_create(ElementInfo* info) {
 
 void array_destroy(DynArray* arr) {
     if (!arr) return;
-    if (arr->info && arr->info->destroy && arr->data) {
-        for (size_t i = 0; i < arr->size; ++i) {
-            void* elem = (char*)arr->data + _offset(arr, i);
-            arr->info->destroy(elem);
-        }
-    }
     free(arr->data);
     free(arr);
 }
@@ -45,17 +37,14 @@ int array_push(DynArray* arr, const void* src) {
     if (!arr || !src || !arr->info || !arr->info->clone) return -1;
     if (arr->size >= arr->capacity && _grow(arr) != 0) return -1;
     
-    // Клонируем объект во временную память
     void* clone = arr->info->clone(src);
     if (!clone) return -1;
     
-    // Копируем байты клона в единый буфер массива
     void* dest = (char*)arr->data + _offset(arr, arr->size);
     memcpy(dest, clone, arr->info->element_size);
     
-    // Освобождаем временный клон (теперь данные в буфере массива)
-    free(clone);
-    
+
+    arr->info->destroy(clone);
     arr->size++;
     return 0;
 }
@@ -69,23 +58,14 @@ size_t array_size(const DynArray* arr) { return arr ? arr->size : 0; }
 size_t array_capacity(const DynArray* arr) { return arr ? arr->capacity : 0; }
 
 int array_clear(DynArray* arr) {
-    if (!arr || !arr->info || !arr->info->destroy || !arr->data) return -1;
-    for (size_t i = 0; i < arr->size; ++i) {
-        void* elem = (char*)arr->data + _offset(arr, i);
-        arr->info->destroy(elem);
-    }
+    if (!arr) return -1;
     arr->size = 0;
     return 0;
 }
 
 int array_remove_at(DynArray* arr, size_t index) {
-    if (!arr || index >= arr->size || !arr->data) return -1;
+    if (!arr || index >= arr->size) return -1;
     
-    // Уничтожаем удаляемый объект
-    void* elem = (char*)arr->data + _offset(arr, index);
-    if (arr->info->destroy) arr->info->destroy(elem);
-    
-    // Сдвигаем оставшиеся объекты
     size_t remaining = arr->size - index - 1;
     if (remaining > 0) {
         void* src = (char*)arr->data + _offset(arr, index + 1);
@@ -109,7 +89,8 @@ DynArray* array_map(const DynArray* arr, MapFunc func) {
             array_destroy(res);
             return NULL;
         }
-        arr->info->destroy(transformed); // func вернула новый объект, push скопировал его в буфер
+
+        arr->info->destroy(transformed);
     }
     return res;
 }

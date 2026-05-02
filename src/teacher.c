@@ -6,30 +6,35 @@
 Teacher* teacher_create(const char* full_name, int age, int id, int exp, const char* subject) {
     Teacher* t = malloc(sizeof(Teacher));
     if (!t) return NULL;
-#ifdef _MSC_VER
-    t->base.full_name = full_name ? _strdup(full_name) : NULL;
-    t->subject = subject ? _strdup(subject) : NULL;
-#else
-    t->base.full_name = full_name ? strdup(full_name) : NULL;
-    t->subject = subject ? strdup(subject) : NULL;
-#endif
+    if (full_name) {
+        strncpy(t->base.full_name, full_name, sizeof(t->base.full_name) - 1);
+        t->base.full_name[sizeof(t->base.full_name) - 1] = '\0';
+    } else {
+        t->base.full_name[0] = '\0';
+    }
     t->base.age = age;
     t->base.id = id;
     t->experience_years = exp;
+    if (subject) {
+        strncpy(t->subject, subject, sizeof(t->subject) - 1);
+        t->subject[sizeof(t->subject) - 1] = '\0';
+    } else {
+        t->subject[0] = '\0';
+    }
     return t;
 }
 
 void teacher_destroy(Teacher* t) {
-    if (!t) return;
-    free(t->base.full_name);
-    free(t->subject);
     free(t);
 }
 
 void* teacher_clone(const void* src) {
     if (!src) return NULL;
     const Teacher* tc = (const Teacher*)src;
-    return teacher_create(tc->base.full_name, tc->base.age, tc->base.id, tc->experience_years, tc->subject);
+    Teacher* t = malloc(sizeof(Teacher));
+    if (!t) return NULL;
+    memcpy(t, tc, sizeof(Teacher));
+    return t;
 }
 
 int teacher_compare(const void* a, const void* b) {
@@ -45,7 +50,8 @@ void teacher_print(const void* t) {
     if (!t) return;
     const Teacher* x = (const Teacher*)t;
     printf("[Teacher] ID: %d, Name: %s, Age: %d, Exp: %d, Subj: %s\n",
-           x->base.id, x->base.full_name ? x->base.full_name : "N/A", x->base.age, x->experience_years, x->subject ? x->subject : "N/A");
+           x->base.id, x->base.full_name, x->base.age,
+           x->experience_years, x->subject);
 }
 
 int teacher_is_senior(const Teacher* t) {

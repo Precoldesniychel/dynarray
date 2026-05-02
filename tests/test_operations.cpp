@@ -21,7 +21,7 @@ TEST(OperationsTest, ConcatThreeTypesThenMap) {
     DynArray* step2 = array_concat(step1, arr_t);
     
     DynArray* mapped = array_map(step2, [](const void* elem) -> void* {
-        Person* copy = person_clone(elem);
+        Person* copy = static_cast<Person*>(person_clone(elem));
         if (copy) copy->age += 1;
         return copy;
     });
@@ -29,10 +29,10 @@ TEST(OperationsTest, ConcatThreeTypesThenMap) {
     ASSERT_NE(mapped, nullptr);
     EXPECT_EQ(array_size(mapped), 3);
 
-    // C-STYLE ПРИВЕДЕНИЕ: MSVC не ругается, работает идентично
-    const Person* p1 = (const Person*)array_get(mapped, 0);
-    const Student* p2 = (const Student*)array_get(mapped, 1);
-    const Teacher* p3 = (const Teacher*)array_get(mapped, 2);
+
+    const Person* p1 = static_cast<const Person*>(array_get(mapped, 0));
+    const Student* p2 = static_cast<const Student*>(array_get(mapped, 1));
+    const Teacher* p3 = static_cast<const Teacher*>(array_get(mapped, 2));
 
     EXPECT_EQ(p1->age, 31);
     EXPECT_EQ(p2->base.age, 21);

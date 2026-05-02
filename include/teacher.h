@@ -1,17 +1,17 @@
 #ifndef TEACHER_H
 #define TEACHER_H
 
+#include "person.h"
+
+typedef struct {
+    Person base;
+    int experience_years;
+    char subject[50];
+} Teacher;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "person.h"
-
-typedef struct Teacher {
-    Person base;
-    int experience_years;
-    char* subject;
-} Teacher;
 
 Teacher* teacher_create(const char* full_name, int age, int id, int exp, const char* subject);
 void teacher_destroy(Teacher* t);
@@ -24,4 +24,4 @@ int teacher_is_senior(const Teacher* t);
 }
 #endif
 
-#endif 
+#endif

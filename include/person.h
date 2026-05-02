@@ -1,15 +1,15 @@
 #ifndef PERSON_H
 #define PERSON_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef struct Person {
-    char* full_name;
+typedef struct {
+    char full_name[100];
     int age;
     int id;
 } Person;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 Person* person_create(const char* full_name, int age, int id);
 void person_destroy(Person* p);
@@ -21,4 +21,4 @@ void person_print(const void* p);
 }
 #endif
 
-#endif 
+#endif
