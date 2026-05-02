@@ -118,3 +118,11 @@ cmake --build . --config Release
   
 
 .\Release\run_tests.exe
+
+
+
+cd C:\Labs\variant17\build
+
+cmake --build . --config Release
+
+.\Release\run_tests.exe --gtest_filter="*ConcatThreeTypesThenMap*"

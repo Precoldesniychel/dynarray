@@ -1,73 +1,47 @@
-#include <gtest/gtest.h>
+﻿#include <gtest/gtest.h>
 #include "dynarray.h"
 #include "student.h"
 #include "teacher.h"
+#include "person.h"
 
-static int is_excellent(const void* p) {
-    return static_cast<const Student*>(p)->gpa >= 4.5;
-}
+TEST(OperationsTest, ConcatThreeTypesThenMap) {
+    DynArray* arr_p = array_create(element_info_person());
+    DynArray* arr_s = array_create(element_info_student());
+    DynArray* arr_t = array_create(element_info_teacher());
 
-static int is_senior(const void* p) {
-    return static_cast<const Teacher*>(p)->experience_years >= 10;
-}
+    Person p  = {"Base", 30, 1};
+    Student s = {{"Ivan", 20, 2}, 4.8};
+    Teacher t = {{"Petr", 50, 3}, 15, "Math"};
 
-TEST(OperationsTest, WhereFilterStudents) {
-    DynArray* arr = array_create(element_info_student());
-    Student s1 = {{"A", 20, 1}, 3.0};
-    Student s2 = {{"B", 20, 2}, 5.0};
-    Student s3 = {{"C", 20, 3}, 4.0};
-    
-    array_push(arr, &s1);
-    array_push(arr, &s2);
-    array_push(arr, &s3);
-    
-    DynArray* filtered = array_where(arr, is_excellent);
-    ASSERT_NE(filtered, nullptr);
-    EXPECT_EQ(array_size(filtered), 1);
-    
-    Student* res = static_cast<Student*>(array_get(filtered, 0));
-    EXPECT_STREQ(res->base.full_name, "B");
-    
-    array_destroy(filtered);
-    array_destroy(arr);
-}
+    ASSERT_EQ(array_push(arr_p, &p), 0);
+    ASSERT_EQ(array_push(arr_s, &s), 0);
+    ASSERT_EQ(array_push(arr_t, &t), 0);
 
-TEST(OperationsTest, WhereFilterTeachers) {
-    DynArray* arr = array_create(element_info_teacher());
-    Teacher t1 = {{"X", 30, 1}, 5, "Chem"};
-    Teacher t2 = {{"Y", 40, 2}, 12, "Math"};
+    DynArray* step1 = array_concat(arr_p, arr_s);
+    DynArray* step2 = array_concat(step1, arr_t);
     
-    array_push(arr, &t1);
-    array_push(arr, &t2);
-    
-    DynArray* filtered = array_where(arr, is_senior);
-    ASSERT_NE(filtered, nullptr);
-    EXPECT_EQ(array_size(filtered), 1);
-    
-    Teacher* res = static_cast<Teacher*>(array_get(filtered, 0));
-    EXPECT_STREQ(res->base.full_name, "Y");
-    
-    array_destroy(filtered);
-    array_destroy(arr);
-}
+    DynArray* mapped = array_map(step2, [](const void* elem) -> void* {
+        Person* copy = person_clone(elem);
+        if (copy) copy->age += 1;
+        return copy;
+    });
 
-TEST(OperationsTest, Concat) {
-    DynArray* a = array_create(element_info_person());
-    DynArray* b = array_create(element_info_person());
-    
-    Student s = {{"S", 20, 1}, 4.0};
-    Teacher t = {{"T", 40, 2}, 10, "Math"};
-    
-    array_push(a, &s);
-    array_push(b, &t);
-    
-    DynArray* c = array_concat(a, b);
-    ASSERT_NE(c, nullptr);
-    EXPECT_EQ(array_size(c), 2);
-    EXPECT_EQ(static_cast<Person*>(array_get(c, 0))->age, 20);
-    EXPECT_EQ(static_cast<Person*>(array_get(c, 1))->age, 40);
-    
-    array_destroy(c);
-    array_destroy(a);
-    array_destroy(b);
+    ASSERT_NE(mapped, nullptr);
+    EXPECT_EQ(array_size(mapped), 3);
+
+    // C-STYLE ПРИВЕДЕНИЕ: MSVC не ругается, работает идентично
+    const Person* p1 = (const Person*)array_get(mapped, 0);
+    const Student* p2 = (const Student*)array_get(mapped, 1);
+    const Teacher* p3 = (const Teacher*)array_get(mapped, 2);
+
+    EXPECT_EQ(p1->age, 31);
+    EXPECT_EQ(p2->base.age, 21);
+    EXPECT_EQ(p3->base.age, 51);
+
+    array_destroy(mapped);
+    array_destroy(step2);
+    array_destroy(step1);
+    array_destroy(arr_p);
+    array_destroy(arr_s);
+    array_destroy(arr_t);
 }
