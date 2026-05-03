@@ -105,13 +105,21 @@ cmake --build . --config Release
 
 
 
+
+
+
+
+
+
+
+
 cd C:\Labs\variant17\build
 
 cmake --build . --config Release
 
 .\Release\run_tests.exe 
 
-.\Release\run_tests.exe --gtest_filter="*ConcatThreeTypesThenMap*"
+.\Release\v17.exe
 
 
 
