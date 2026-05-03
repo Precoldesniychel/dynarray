@@ -54,8 +54,10 @@ typedef struct {
 │   └── polymorphic_record.c  // Функции работы с PersonRecord
 ├── cli/
 │   └── interface.c           // Консольный интерфейс пользователя
-├── tests/
-│   └── test_full.cpp         // Модульные тесты (Google Test)
+├── tests/                    // Модульные тесты (Google Test)
+│   ├── test_dynarray.cpp
+│   ├── test_operations.cpp
+│   └── test_polymorphism.cpp      
 └── CMakeLists.txt
 
 ```
