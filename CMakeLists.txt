@@ -23,9 +23,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 add_library(dynarray_static STATIC
     src/dynarray.c
     src/element_info.c
-    src/person.c
-    src/student.c
-    src/teacher.c
+    src/polymorphic_record.c
 )
 
 

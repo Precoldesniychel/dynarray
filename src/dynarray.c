@@ -36,15 +36,14 @@ void array_destroy(DynArray* arr) {
 int array_push(DynArray* arr, const void* src) {
     if (!arr || !src || !arr->info || !arr->info->clone) return -1;
     if (arr->size >= arr->capacity && _grow(arr) != 0) return -1;
-    
+
     void* clone = arr->info->clone(src);
     if (!clone) return -1;
-    
+
     void* dest = (char*)arr->data + _offset(arr, arr->size);
     memcpy(dest, clone, arr->info->element_size);
-    
 
-    arr->info->destroy(clone);
+    arr->info->destroy(clone);  
     arr->size++;
     return 0;
 }
@@ -65,7 +64,6 @@ int array_clear(DynArray* arr) {
 
 int array_remove_at(DynArray* arr, size_t index) {
     if (!arr || index >= arr->size) return -1;
-    
     size_t remaining = arr->size - index - 1;
     if (remaining > 0) {
         void* src = (char*)arr->data + _offset(arr, index + 1);
@@ -80,7 +78,7 @@ DynArray* array_map(const DynArray* arr, MapFunc func) {
     if (!arr || !func || !arr->info) return NULL;
     DynArray* res = array_create(arr->info);
     if (!res) return NULL;
-    
+
     for (size_t i = 0; i < arr->size; ++i) {
         void* elem = array_get(arr, i);
         void* transformed = func(elem);
@@ -89,7 +87,6 @@ DynArray* array_map(const DynArray* arr, MapFunc func) {
             array_destroy(res);
             return NULL;
         }
-
         arr->info->destroy(transformed);
     }
     return res;
@@ -99,7 +96,7 @@ DynArray* array_where(const DynArray* arr, WhereFunc predicate) {
     if (!arr || !predicate || !arr->info) return NULL;
     DynArray* res = array_create(arr->info);
     if (!res) return NULL;
-    
+
     for (size_t i = 0; i < arr->size; ++i) {
         void* elem = array_get(arr, i);
         if (predicate(elem)) {
@@ -113,10 +110,13 @@ DynArray* array_where(const DynArray* arr, WhereFunc predicate) {
 }
 
 DynArray* array_concat(const DynArray* a, const DynArray* b) {
-    if (!a || !b || !element_info_is_compatible(a->info, b->info)) return NULL;
+    if (!a || !b) return NULL;
+    if (a->info->element_size != b->info->element_size) return NULL;
+    if (!element_info_is_compatible(a->info, b->info)) return NULL;
+
     DynArray* res = array_create(a->info);
     if (!res) return NULL;
-    
+
     for (size_t i = 0; i < a->size; ++i) {
         if (array_push(res, array_get(a, i)) != 0) { array_destroy(res); return NULL; }
     }

@@ -7,13 +7,7 @@
     <ClCompile Include="C:\Labs\variant17\src\element_info.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Labs\variant17\src\person.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Labs\variant17\src\student.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Labs\variant17\src\teacher.c">
+    <ClCompile Include="C:\Labs\variant17\src\polymorphic_record.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

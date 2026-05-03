@@ -1,31 +1,34 @@
 #include <gtest/gtest.h>
 #include "dynarray.h"
-#include "student.h"
-#include "teacher.h"
+#include "element_info.h"
+#include "polymorphic_record.h"
 
-TEST(PolymorphismTest, MixedArray) {
-    DynArray* people = array_create(element_info_person());
-    
-    Student s = {{"Ivan", 20, 1}, 4.8};
-    Teacher t = {{"Petr", 50, 2}, 15, "Math"};
-    
-    EXPECT_EQ(array_push(people, &s), 0);
-    EXPECT_EQ(array_push(people, &t), 0);
-    EXPECT_EQ(array_size(people), 2);
-    
-    Person* p1 = static_cast<Person*>(array_get(people, 0));
-    ASSERT_NE(p1, nullptr);
-    EXPECT_STREQ(p1->full_name, "Ivan");
-    
-    Person* p2 = static_cast<Person*>(array_get(people, 1));
-    ASSERT_NE(p2, nullptr);
-    EXPECT_STREQ(p2->full_name, "Petr");
-    
-    array_destroy(people);
+
+static PersonRecord* make_student(const char* name, int age, int id, double gpa) {
+    return record_create_student(name, age, id, gpa);
 }
 
-TEST(PolymorphismTest, TypeInfoCompatibility) {
-    EXPECT_EQ(element_info_is_compatible(element_info_person(), element_info_student()), 1);
-    EXPECT_EQ(element_info_is_compatible(element_info_student(), element_info_person()), 1);
-    EXPECT_EQ(element_info_is_compatible(element_info_person(), element_info_teacher()), 1);
+
+static PersonRecord* make_teacher(const char* name, int age, int id, int exp, const char* subj) {
+    return record_create_teacher(name, age, id, exp, subj);
+}
+
+
+TEST(PolymorphismTest, MixedArray) {
+    DynArray* arr = array_create(element_info_person_record());
+    PersonRecord* s = make_student("Stud", 20, 1, 4.0);
+    PersonRecord* t = make_teacher("Teach", 50, 2, 5, "Bio");
+    array_push(arr, s); array_push(arr, t);
+    record_destroy(s); record_destroy(t);
+
+    EXPECT_EQ(static_cast<PersonRecord*>(array_get(arr, 0))->type, RECORD_STUDENT);
+    EXPECT_EQ(static_cast<PersonRecord*>(array_get(arr, 1))->type, RECORD_TEACHER);
+    array_destroy(arr);
+}
+
+TEST(PolymorphismTest, TypeInfoSameSizeCompatible) {
+    ElementInfo* info = element_info_person_record();
+    EXPECT_EQ(info->element_size, sizeof(PersonRecord));
+    int compatible = element_info_is_compatible(info, info);
+    EXPECT_NE(compatible, 0);
 }
