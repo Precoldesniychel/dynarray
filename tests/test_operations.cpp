@@ -1,4 +1,5 @@
 ﻿#include <gtest/gtest.h>
+#include <stdio.h>
 #include "dynarray.h"
 #include "element_info.h"
 #include "polymorphic_record.h"
@@ -240,8 +241,14 @@ TEST(OperationsTest, ConcatMixedTypesAndMap) {
     EXPECT_EQ(r2->age, 33);
     EXPECT_DOUBLE_EQ(r2->data.student.gpa, 4.5);
 
-    for (size_t i = 0; i < array_size(mapped); ++i)
-         mapped->info->print(array_get(mapped, i));
+    for (size_t i = 0; i < array_size(mapped); ++i) {
+        const void* elem = array_get(mapped, i);
+        char* s = mapped->info->to_string(elem);
+        if (s) {
+            printf("%s\n", s);
+            free(s);
+        }
+    }
 
     array_destroy(mapped);
     array_destroy(merged);

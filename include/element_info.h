@@ -8,7 +8,7 @@ extern "C" {
 #include <stddef.h>
 
 typedef enum {
-    TYPE_PERSON_RECORD   
+    TYPE_PERSON_RECORD
 } ElementType;
 
 typedef struct ElementInfo {
@@ -16,10 +16,9 @@ typedef struct ElementInfo {
     void* (*clone)(const void*);
     void  (*destroy)(void*);
     int   (*compare)(const void*, const void*);
-    void  (*print)(const void*);
+    char* (*to_string)(const void*);  
     ElementType type;
 } ElementInfo;
-
 
 ElementInfo* element_info_person_record(void);
 int element_info_is_compatible(const ElementInfo* a, const ElementInfo* b);

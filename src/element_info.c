@@ -3,14 +3,15 @@
 #include <stdlib.h>
 
 static ElementInfo* _create_info(size_t sz, void* (*cl)(const void*), void (*dst)(void*),
-                                 int (*cmp)(const void*, const void*), void (*prt)(const void*), ElementType t) {
+                                 int (*cmp)(const void*, const void*),
+                                 char* (*tostr)(const void*), ElementType t) {
     ElementInfo* info = (ElementInfo*)calloc(1, sizeof(ElementInfo));
     if (!info) return NULL;
     info->element_size = sz;
     info->clone = cl;
     info->destroy = dst;
     info->compare = cmp;
-    info->print = prt;
+    info->to_string = tostr;
     info->type = t;
     return info;
 }
@@ -22,7 +23,7 @@ ElementInfo* element_info_person_record(void) {
                                     record_clone,
                                     record_destroy,
                                     record_compare,
-                                    record_print,
+                                    record_to_string,
                                     TYPE_PERSON_RECORD);
     }
     return _record_info;
@@ -30,5 +31,5 @@ ElementInfo* element_info_person_record(void) {
 
 int element_info_is_compatible(const ElementInfo* a, const ElementInfo* b) {
     if (!a || !b) return 0;
-    return (a->element_size == b->element_size);
+    return (a->type == b->type) && (a->element_size == b->element_size);
 }

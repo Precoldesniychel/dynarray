@@ -36,7 +36,7 @@ PersonRecord* record_create_teacher(const char* name, int age, int id, int exp, 
 void* record_clone(const void* src);
 void  record_destroy(void* p);
 int   record_compare(const void* a, const void* b);
-void  record_print(const void* p);
+char* record_to_string(const void* p);  
 
 #ifdef __cplusplus
 }

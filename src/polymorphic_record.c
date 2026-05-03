@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdio.h>
 
-
 static void init_base(PersonRecord* rec, const char* name, int age, int id, RecordType type) {
     if (name) {
         strncpy(rec->full_name, name, sizeof(rec->full_name) - 1);
@@ -56,16 +55,19 @@ int record_compare(const void* a, const void* b) {
     return ra->id - rb->id;
 }
 
-void record_print(const void* p) {
+char* record_to_string(const void* p) {
     const PersonRecord* rec = (const PersonRecord*)p;
-    if (!rec) return;
-    printf("[%s] ID: %d, Name: %s, Age: %d, ",
-           rec->type == RECORD_STUDENT ? "Student" : "Teacher",
-           rec->id, rec->full_name, rec->age);
+    if (!rec) return NULL;
+    char buffer[512];
     if (rec->type == RECORD_STUDENT) {
-        printf("GPA: %.2f\n", rec->data.student.gpa);
+        snprintf(buffer, sizeof(buffer), "[Student] ID: %d, Name: %s, Age: %d, GPA: %.2f",
+                 rec->id, rec->full_name, rec->age, rec->data.student.gpa);
     } else {
-        printf("Exp: %d, Subj: %s\n", rec->data.teacher.experience_years,
-               rec->data.teacher.subject);
+        snprintf(buffer, sizeof(buffer), "[Teacher] ID: %d, Name: %s, Age: %d, Exp: %d, Subj: %s",
+                 rec->id, rec->full_name, rec->age,
+                 rec->data.teacher.experience_years, rec->data.teacher.subject);
     }
+    char* result = (char*)malloc(strlen(buffer) + 1);
+    if (result) strcpy(result, buffer);
+    return result;
 }

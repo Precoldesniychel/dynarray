@@ -5,7 +5,6 @@
 #include "element_info.h"
 #include "polymorphic_record.h"
 
-
 static void* map_increment_gpa(const void* p) {
     const PersonRecord* rec = (const PersonRecord*)p;
     if (rec->type == RECORD_STUDENT) {
@@ -17,18 +16,15 @@ static void* map_increment_gpa(const void* p) {
     return record_clone(p);
 }
 
-
 static int filter_excellent(const void* p) {
     const PersonRecord* rec = (const PersonRecord*)p;
     return rec->type == RECORD_STUDENT && rec->data.student.gpa >= 4.5;
 }
 
-
 static int filter_senior(const void* p) {
     const PersonRecord* rec = (const PersonRecord*)p;
     return rec->type == RECORD_TEACHER && rec->data.teacher.experience_years >= 10;
 }
-
 
 static int read_int(const char* prompt, int min, int max, int* out) {
     char buf[64];
@@ -41,7 +37,6 @@ static int read_int(const char* prompt, int min, int max, int* out) {
     return 0;
 }
 
-
 static int read_double(const char* prompt, double min, double max, double* out) {
     char buf[64];
     printf("%s", prompt);
@@ -53,26 +48,27 @@ static int read_double(const char* prompt, double min, double max, double* out) 
     return 0;
 }
 
-
 static int has_duplicate_id(const DynArray* arr, int id) {
     for (size_t i = 0; i < array_size(arr); ++i) {
         const PersonRecord* rec = (const PersonRecord*)array_get(arr, i);
-        if (rec && rec->id == id) {
-            return 1; 
-        }
+        if (rec && rec->id == id) return 1;
     }
-    return 0; 
+    return 0;
 }
-
 
 static void print_array(const DynArray* arr, const char* title) {
     printf("\n=== %s (Size: %zu) ===\n", title, array_size(arr));
     for (size_t i = 0; i < array_size(arr); ++i) {
         void* p = array_get(arr, i);
-        if (p) arr->info->print(p);
+        if (p) {
+            char* str = arr->info->to_string(p);
+            if (str) {
+                printf("%s\n", str);
+                free(str);
+            }
+        }
     }
 }
-
 
 static void load_demo(DynArray* arr) {
     PersonRecord* s1 = record_create_student("Ivanov", 20, 1, 4.8);
@@ -118,13 +114,7 @@ void run_interface(void) {
                 printf("Name: "); fgets(name, sizeof(name), stdin); name[strcspn(name, "\n")] = 0;
                 if (read_int("Age: ", 16, 100, &age) || read_int("ID: ", 1, 9999, &id) ||
                     read_double("GPA: ", 0.0, 5.0, &gpa)) { printf("Invalid input.\n"); break; }
-
-
-                if (has_duplicate_id(people, id)) {
-                    printf("Error: ID %d already exists.\n", id);
-                    break;
-                }
-
+                if (has_duplicate_id(people, id)) { printf("Error: ID %d already exists.\n", id); break; }
                 PersonRecord* s = record_create_student(name, age, id, gpa);
                 if (!s) { printf("Memory error.\n"); break; }
                 if (array_push(people, s)) printf("Error adding student.\n");
@@ -138,13 +128,7 @@ void run_interface(void) {
                 if (read_int("Age: ", 16, 100, &age) || read_int("ID: ", 1, 9999, &id) ||
                     read_int("Experience: ", 0, 50, &exp)) { printf("Invalid input.\n"); break; }
                 printf("Subject: "); fgets(subj, sizeof(subj), stdin); subj[strcspn(subj, "\n")] = 0;
-
-                
-                if (has_duplicate_id(people, id)) {
-                    printf("Error: ID %d already exists.\n", id);
-                    break;
-                }
-
+                if (has_duplicate_id(people, id)) { printf("Error: ID %d already exists.\n", id); break; }
                 PersonRecord* t = record_create_teacher(name, age, id, exp, subj);
                 if (!t) { printf("Memory error.\n"); break; }
                 if (array_push(people, t)) printf("Error adding teacher.\n");
