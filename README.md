@@ -102,33 +102,3 @@ cmake --build . --config Release
   
 
 .\Release\run_tests.exe
-
-
-
-
-
-
-
-
-
-
-
-cd C:\Labs\variant17\build
-
-cmake --build . --config Release
-
-.\Release\run_tests.exe 
-
-.\Release\v17.exe
-
-
-
-cd C:\Labs\variant17
-
-git status
-
-git add .
-
-git commit -m "Update"
-
-git push origin main
